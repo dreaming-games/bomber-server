@@ -11,6 +11,8 @@
 
 # Generated files
 target/
+server.log
+server.log.lck
 .idea/**/contentModel.xml
 
 # Sensitive or high-churn files
