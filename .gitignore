@@ -2,6 +2,7 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff
+.idea/
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
@@ -9,6 +10,7 @@
 .idea/**/shelf
 
 # Generated files
+target/
 .idea/**/contentModel.xml
 
 # Sensitive or high-churn files
@@ -48,6 +50,7 @@ cmake-build-*/
 
 # IntelliJ
 out/
+*.iml
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
