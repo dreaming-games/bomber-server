@@ -3,10 +3,23 @@ package server;
 import game.field.FieldParser;
 import game.field.GameField;
 import game.play.Game;
+import game.play.Player;
+import game.general.Point;
+
 import server.clients.ClientSocket;
 
-public class GameStarter {
+import java.util.List;
+import java.util.ArrayList;
+
+
+public class GameRunner {
     private Game currentGame;
+    private final List<Game> runningGames;
+
+    public GameRunner() {
+        this.runningGames = new ArrayList<>();
+        loadNewGame();
+    }
 
     private void loadNewGame() {
         // Load the specified map for this game
@@ -15,10 +28,12 @@ public class GameStarter {
         this.currentGame = new Game(field);
     }
 
-    public void addToGame(ClientSocket client) {
+    public void addToGame(ClientSocket client, String name) {
         if (currentGame == null || currentGame.isFull()) {
             loadNewGame();
         }
-        // Todo: Add this client to the current game
+        // Find a spawnpoint for this player and add player to this game
+        Player clientPlayer = new Player(this.currentGame.nextSpawnPoint(), name);
+        this.currentGame.addPlayer(clientPlayer);
     }
 }

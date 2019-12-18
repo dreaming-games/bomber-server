@@ -8,7 +8,7 @@ public class ClientSocket {
     private Thread thread;
 
     private void getMessage() {
-
+        
     }
 
     public ClientSocket(Socket connection, ClientHandler handler) {

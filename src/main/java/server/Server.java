@@ -14,6 +14,8 @@ public class Server {
 
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) {
+        System.out.println("\n");
+
         // Start server socket
         ServerSocket serverSocket;
         try {

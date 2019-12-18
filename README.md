@@ -7,7 +7,6 @@ mvn clean compile exec:java
 
 ## Are you Martin?
 ```
-xhost local:root
 docker build -t ubuntu_bomber .
 docker run -v $(pwd):/bomber -it ubuntu_bomber
 ```

@@ -12,7 +12,7 @@ public class Player {
     private Direction direction;
 
 
-    Player(Point location, String name) {
+    public Player(Point location, String name) {
         this.location = location;
         // South so that we all look down I guess
         this.direction = Direction.SOUTH;
