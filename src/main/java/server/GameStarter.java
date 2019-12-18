@@ -11,6 +11,7 @@ public class GameStarter {
     private void loadNewGame() {
         // Load the specified map for this game
         GameField field = new FieldParser().fromBMapFile("./classic.bmap");
+        System.out.println("Loaded new map: \n" + field.toString());
         this.currentGame = new Game(field);
     }
 

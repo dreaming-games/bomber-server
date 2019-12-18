@@ -1,8 +1,5 @@
 package server;
 
-import game.field.FieldParser;
-import game.field.GameField;
-import game.play.Game;
 import server.clients.ClientHandler;
 import server.clients.ClientSocket;
 

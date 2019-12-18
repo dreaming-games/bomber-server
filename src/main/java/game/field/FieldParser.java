@@ -1,9 +1,11 @@
 package game.field;
 
-import game.field.GameField;
 import game.general.Point;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class FieldParser {
