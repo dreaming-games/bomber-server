@@ -31,7 +31,7 @@ public class FieldParser {
         }
     }
 
-    public GameField fromBMapFormat(InputStream in, String fileLogName) {
+    private GameField fromBMapFormat(InputStream in, String fileLogName) {
         // Stuff we wanna get about the map
         ArrayList<Point> spawnPoints = new ArrayList<>();
         ArrayList<byte[]> byteLines = new ArrayList<>();
@@ -63,7 +63,7 @@ public class FieldParser {
         return new GameField(byteLines, spawnPoints);
     }
 
-    public GameField fromBMapFile(String file) throws FileNotFoundException {
+    public GameField fromBMapFile(String file) {
         return fromBMapFormat(getClass().getClassLoader().getResourceAsStream(file), file);
     }
 }

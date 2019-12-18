@@ -1,4 +1,4 @@
-package game;
+package game.play;
 
 import game.general.Direction;
 import game.general.Point;

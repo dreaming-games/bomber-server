@@ -1,32 +1,44 @@
 package game.field;
 
 import game.general.Point;
+import lombok.Getter;
 
 import java.util.ArrayList;
 
 public class GameField {
+    @Getter
     private final Point[] spawnPoints;
     private final byte[][] field;
 
     GameField(ArrayList<byte[]> byteLines, ArrayList<Point> spawnPoints) {
         this.spawnPoints = new Point[spawnPoints.size()];
         if (spawnPoints.toArray(this.spawnPoints) != this.spawnPoints) {
-            System.err.println("We done fucked up in constructor...");
+            throw new RuntimeException("We done fucked up in constructor...");
         }
-        this.field = new byte[byteLines.get(0).length][byteLines.size()];
+        this.field = new byte[byteLines.size()][];
         if (byteLines.toArray(this.field) != this.field) {
-            System.err.println("We done fucked up in constructor...");
+            throw new RuntimeException("We done fucked up in constructor...");
         }
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int x = 0; x < this.field.length; x++) {
-            for (int y = 0; y < this.field.length; y++) {
-                System.out.println(field[y]);
-                sb.append(field[y][x]);
+        for (byte[] bytes : this.field) {
+            for (byte aByte : bytes) {
+                switch (aByte) {
+                    case 0:
+                        sb.append("  ");
+                        break;
+                    case 1:
+                        sb.append("##");
+                        break;
+                    case 10:
+                        sb.append("[]");
+                        break;
+                }
             }
+            sb.append('\n');
         }
         return sb.toString();
     }
