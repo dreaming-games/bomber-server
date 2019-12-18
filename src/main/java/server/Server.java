@@ -1,5 +1,10 @@
 package server;
 
+import game.field.FieldParser;
+import game.field.GameField;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -11,6 +16,14 @@ public class Server {
 
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) {
+        // Load the specified map (for now)
+        try {
+            GameField field = new FieldParser().fromBMapFile("./classic.bmap");
+            System.out.println(field.toString());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
 
         ServerSocket serverSocket;
         try {
@@ -22,13 +35,13 @@ public class Server {
             return;
         }
 
-        while (true) {
-            try {
-                Socket newUser = serverSocket.accept();
-                LOGGER.log(Level.INFO,"Accepted a new user socket");
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Error creating server socket:" + e.getMessage());
-            }
-        }
+//        while (true) {
+//            try {
+//                Socket newUser = serverSocket.accept();
+//                LOGGER.log(Level.INFO,"Accepted a new user socket");
+//            } catch (IOException e) {
+//                LOGGER.log(Level.SEVERE, "Error creating server socket:" + e.getMessage());
+//            }
+//        }
     }
 }
