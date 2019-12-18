@@ -34,4 +34,8 @@ public class Game {
     public Point nextSpawnPoint() {
         return field.getSpawnPoints()[this.players.size()];
     }
+
+    public int players() {
+        return this.players.size();
+    }
 }

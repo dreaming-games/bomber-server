@@ -1,7 +1,8 @@
-package server;
+package server.main;
 
 import server.clients.ClientHandler;
 import server.clients.ClientSocket;
+import server.manager.GameRunner;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -10,11 +11,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Server {
-    private static final Logger LOGGER = EasyLogger.getLogger(Server.class.getName());
+
 
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) {
         System.out.println("\n");
+        GameRunner gameRunner = new GameRunner();
+        ClientHandler clientHandler = new ClientHandler(gameRunner);
+        Logger LOGGER = EasyLogger.getLogger("Server", gameRunner);
 
         // Start server socket
         ServerSocket serverSocket;
@@ -28,7 +32,6 @@ public class Server {
         }
 
         // Accept all the clients you can get
-        ClientHandler clientHandler = new ClientHandler();
         while (true) {
             try {
                 Socket newUser = serverSocket.accept();
