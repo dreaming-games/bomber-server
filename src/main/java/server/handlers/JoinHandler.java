@@ -26,7 +26,8 @@ public class JoinHandler implements ClientHandler {
                 this.game.spawnPoint(playerId));
         this.game.addPlayer(clientPlayer);
         this.clients[clientPlayer.getId()] = client;
-        client.setHandler(this);
+        client.inGameId = clientPlayer.getId();
+        client.handler = this;
         client.send("joined " + clientPlayer.getId());
         update();
     }
@@ -57,7 +58,7 @@ public class JoinHandler implements ClientHandler {
                 sendNames(c);
                 c.send("loading " + field.getWidth() + "/" + field.getHeight());
             }
-            // Send the map to be played and use 'PlayHandler'
+            // Send the map to be played and let 'PlayHandler' take over
             for (ClientSocket c : clients) c.send(field.toString());
             new PlayHandler(game, clients);
         }

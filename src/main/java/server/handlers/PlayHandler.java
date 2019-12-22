@@ -11,12 +11,20 @@ public class PlayHandler implements ClientHandler {
         this.game = game;
         this.clients = clients;
         for (ClientSocket client : clients) {
-            client.setHandler(this);
+            client.handler = this;
         }
     }
 
     @Override
     public void onMessage(ClientSocket socket, String msg) {
+        String[] msgParts = msg.split(" ", 2);
+        switch (msgParts[0]) {
+            case "drop": // Drop a bomb
 
+                break;
+            case "move": // Move in a certain direction
+
+                break;
+        }
     }
 }

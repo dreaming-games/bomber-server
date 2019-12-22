@@ -34,6 +34,9 @@ public class Game {
         return field.getSpawnPoints()[index];
     }
 
+    public void gameTick() {
+
+    }
 
     ////////////////////////////////////////
     /////// Helper methods basically ///////

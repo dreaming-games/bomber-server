@@ -11,13 +11,20 @@ docker run -v $(pwd):/bomber -it ubuntu_bomber
 ```
 In the container move to /bomber and run the compile and run command above
 
+## Code changes
+
+#### Game / Server separation
+The game code and server code are separated so that the game is 100% independent of the server
+i.e. the server includes game packages, but the game never includes the server packages. Try to keep
+it this way and keep this in mind to put the changes in the place they belong.
+Other than that, change whatever you want bois, the classes probably speak for themselves.
 ## Server - Client messages
 
 #### General
-- Most messages will use ascii encoding for ease of integration and debugging
-- Most messages will use a ```\n``` as message termination character
+- Most (if not all) messages will use ascii encoding for ease of integration and debugging
+- Most (if not all) messages will use a ```\n``` as message termination character
 - Sending a message does not mean the server accepts it. For example just because you sent move left does
-not mean the server allows it, so wait for the server to update game state
+not mean the server allows it (this holds for all message including pre/post game), so wait for the server to update game state
 
 #### Pre and post game messages
 - To join a game, the message ```join NAME``` can be sent by a client, where ```NAME``` is the name
@@ -51,6 +58,12 @@ This also means all player numbers in this game are from 0 until Y.
 During the game, the server will send the following messages:
 - ```map X/Y Z``` meaning the object on the map at X/Y changed to Z where Z is a map symbol.
 - ```p P X/Y D``` meaning that player P is now at X/Y facing direction D.
-- ```hurt P``` meaning that player P got damage.
+- ```hurt P``` meaning that player P got damaged.
 - ```died P``` meaning that player P died.
-- ```bomb P X/Y``` 
+- ```bomb P X/Y``` meaning that player P dropped a bomb at location X Y.
+
+Clients can send two different messages during a game:
+- ```move D``` to move in direction D where D is one of ```{ N, NE, E, SE, S, SW, W, NW }``` for
+the direction to move in based on wind direction annotations.
+- ```drop B``` to drop a bomb, where B is the bomb type id (in case we implement different bombs)
+sending ```bomb``` will be the same as ```bomb 0``` aka the default cross explosion bombs.

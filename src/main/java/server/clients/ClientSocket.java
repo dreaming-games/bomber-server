@@ -11,8 +11,8 @@ public class ClientSocket {
     private final Socket connection;
     private final BufferedReader reader;
     private final BufferedWriter writer;
-    @Setter
-    private ClientHandler handler;
+    public ClientHandler handler;
+    public int inGameId;
 
     private void messageLoop() {
         // Keep receiving messages and sent them to your handler

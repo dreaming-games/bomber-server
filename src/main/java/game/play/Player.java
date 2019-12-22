@@ -10,6 +10,8 @@ public class Player {
     private final int id;
     @Getter
     private String name;
+    @Getter
+    private Stats stats;
     @Setter @Getter
     private Point location;
     @Setter @Getter
@@ -18,9 +20,10 @@ public class Player {
 
     public Player(int id, String name, Point location) {
         this.id = id;
-        this.location = location;
         this.name = name;
+        this.location = location;
         // South so that we all look down I guess
         this.direction = Direction.SOUTH;
+        this.stats = new Stats();
     }
 }
