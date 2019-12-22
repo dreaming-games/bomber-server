@@ -40,12 +40,7 @@ This ```idle``` message may also be received when first establishing a connectio
 broadcast to every player of this game, and the map has width W and height H.
 - After the loading message you will receive H messages of length W in a row
 which contains the map to be played in this game. In these messages the symbols are
-used that are described in the Symbols section.
-- On receiving the whole map you should reply with the message ```loaded M``` where
-M is a hash of the map received created by ```M = 0; M += ascii( C ); M <<= 1; for every received character C```.
-The server to this will respond with ```loaded``` or ```reload``` based on if your hash was correct.
-If it was, do nothing, if it was not, the server will resend
-the ```loading W/H``` message and start retransmitting the map.
+used that are described in the Symbols section..
 - The message ```starting X/Y Z``` means that the game will begin in Z seconds,
 this message will be sent every second (or more) until (including) Z is 0.
 When Z reaches 0 the game has begun. In this message X is again your player

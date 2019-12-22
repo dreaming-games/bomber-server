@@ -51,12 +51,14 @@ public class JoinHandler implements ClientHandler {
         // Todo: if a send fails... I guess kick them from the game?
         // Check if we are ready to play!
         if (this.game.isFull()) {
+            GameField field = this.game.getField();
             for (ClientSocket c : clients) {
-                // Send all player names
+                // Send all player names and 'loading' message
                 sendNames(c);
-                // Send the map to be played
-                c.send(this.game.getField().toString());
+                c.send("loading " + field.getWidth() + "/" + field.getHeight());
             }
+            // Send the map to be played and use 'PlayHandler'
+            for (ClientSocket c : clients) c.send(field.toString());
             new PlayHandler(game, clients);
         }
     }

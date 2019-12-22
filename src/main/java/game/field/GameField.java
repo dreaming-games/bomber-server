@@ -21,6 +21,14 @@ public class GameField {
         }
     }
 
+    public int getWidth() {
+        return this.field[0].length;
+    }
+
+    public int getHeight() {
+        return this.field.length;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
