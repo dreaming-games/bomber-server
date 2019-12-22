@@ -66,6 +66,7 @@ public class FieldParser {
     }
 
     public GameField fromBMapFile(String file) {
-        return fromBMapFormat(getClass().getClassLoader().getResourceAsStream(file), file);
+        return fromBMapFormat(getClass().getClassLoader()
+                .getResourceAsStream(file), file);
     }
 }

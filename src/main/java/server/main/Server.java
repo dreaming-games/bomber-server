@@ -1,24 +1,19 @@
 package server.main;
 
-import server.clients.ClientHandler;
 import server.clients.ClientSocket;
-import server.manager.GameRunner;
+import server.handlers.IdleHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Server {
-
-
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) {
         System.out.println("\n");
-        GameRunner gameRunner = new GameRunner();
-        ClientHandler clientHandler = new ClientHandler(gameRunner);
-        Logger LOGGER = EasyLogger.getLogger("Server", gameRunner);
+        IdleHandler idleHandler = new IdleHandler();
+        Logger LOGGER = EasyLogger.getLogger("Server");
 
         // Start server socket
         ServerSocket serverSocket;
@@ -32,13 +27,13 @@ public class Server {
         }
 
         // Accept all the clients you can get
+        int currentClientId = 0;
         while (true) {
             try {
-                Socket newUser = serverSocket.accept();
-                clientHandler.add(new ClientSocket(newUser, clientHandler));
-                LOGGER.log(Level.INFO,"Accepted a new user socket");
+                new ClientSocket(++currentClientId, serverSocket.accept(), idleHandler);
+                LOGGER.log(Level.INFO,"Accepted a new client socket");
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Error creating server socket:" + e.getMessage());
+                LOGGER.log(Level.SEVERE, "Failed to accept socket:" + e.getMessage());
             }
         }
     }

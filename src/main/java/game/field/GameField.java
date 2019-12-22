@@ -26,20 +26,19 @@ public class GameField {
         StringBuilder sb = new StringBuilder();
         for (byte[] bytes : this.field) {
             for (byte aByte : bytes) {
-                switch (aByte) {
-                    case 0:
-                        sb.append("  ");
-                        break;
-                    case 1:
-                        sb.append("##");
-                        break;
-                    case 10:
-                        sb.append("[]");
-                        break;
+                if (aByte == 0) {
+                    // Empty spot
+                    sb.append(" ");
+                } else if (aByte == 1) {
+                    // A wall
+                    sb.append("#");
+                } else if (aByte >= 10 && aByte <= 100) {
+                    // Crate, filled or not
+                    sb.append(".");
                 }
             }
             sb.append('\n');
         }
-        return sb.toString();
+        return sb.deleteCharAt(sb.length() - 1).toString();
     }
 }
