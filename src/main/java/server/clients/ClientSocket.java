@@ -5,6 +5,7 @@ import server.handlers.ClientHandler;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.channels.AsynchronousSocketChannel;
 
 public class ClientSocket {
     private final int clientID;
@@ -22,7 +23,7 @@ public class ClientSocket {
                 if (in == null) break;
                 this.handler.onMessage(this, in);
             } catch (IOException e) {
-                System.err.println("Failed to read line on socket from client " + clientID + ": " + e.getMessage());
+                break;
             }
         }
         System.err.println("Connection with client " + clientID + " closed");
@@ -46,7 +47,6 @@ public class ClientSocket {
             this.writer.flush();
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
             return false;
         }
     }

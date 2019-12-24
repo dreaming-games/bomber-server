@@ -1,6 +1,9 @@
 package game.play;
 
-public class Stats {
+import lombok.Getter;
+
+class Stats {
+    @Getter
     private double moveSpeed;
 
     Stats() {

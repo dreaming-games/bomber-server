@@ -29,24 +29,36 @@ public class GameField {
         return this.field.length;
     }
 
+
+
+    ////////////////////////////////////////////
+    ////// Some convenient toString stuff //////
+    ////////////////////////////////////////////
+
+    public String toString(int lineY) {
+        StringBuilder sb = new StringBuilder();
+        for (byte aByte : this.field[lineY]) {
+            if (aByte == 0) {
+                // Empty spot
+                sb.append(" ");
+            } else if (aByte == 1) {
+                // A wall
+                sb.append("#");
+            } else if (aByte >= 10 && aByte <= 100) {
+                // Crate, filled or not
+                sb.append(".");
+            }
+        }
+        return sb.toString();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (byte[] bytes : this.field) {
-            for (byte aByte : bytes) {
-                if (aByte == 0) {
-                    // Empty spot
-                    sb.append(" ");
-                } else if (aByte == 1) {
-                    // A wall
-                    sb.append("#");
-                } else if (aByte >= 10 && aByte <= 100) {
-                    // Crate, filled or not
-                    sb.append(".");
-                }
-            }
-            sb.append('\n');
+        for (int i = 0; i < this.field.length; i++) {
+            sb.append(toString(i)).append('\n');
         }
+        // Return without the last '\n' character
         return sb.deleteCharAt(sb.length() - 1).toString();
     }
 }

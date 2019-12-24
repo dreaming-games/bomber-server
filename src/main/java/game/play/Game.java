@@ -30,12 +30,32 @@ public class Game {
         this.joinedPlayers++;
     }
 
+    public void removePlayer(Player player) {
+        assert(this.players[player.getId()] == player);
+        this.players[player.getId()] = null;
+        this.joinedPlayers--;
+    }
+
     public Point spawnPoint(int index) {
         return field.getSpawnPoints()[index];
     }
 
-    public void gameTick() {
+    public boolean isFinished() {
+        int alive = 0;
+        for (Player p : players) {
+            if (p != null && p.isAlive()) {
+                alive++;
+            }
+        }
+        // Finished if: ( VS battle and only 1 alive) or 0 alive
+        return (this.playerSlots() > 1 && alive <= 1) || alive == 0;
+    }
 
+    public void gameTick() {
+        // Move players
+        for (Player p : players) {
+            if (p != null) p.move();
+        }
     }
 
     ////////////////////////////////////////

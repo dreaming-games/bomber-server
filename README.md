@@ -48,10 +48,9 @@ broadcast to every player of this game, and the map has width W and height H.
 - After the loading message you will receive H messages of length W in a row
 which contains the map to be played in this game. In these messages the symbols are
 used that are described in the Symbols section..
-- The message ```starting X/Y Z``` means that the game will begin in Z seconds,
+- The message ```starting Y Z``` means that the game will begin in Z seconds,
 this message will be sent every second (or more) until (including) Z is 0.
-When Z reaches 0 the game has begun. In this message X is again your player
-number for this game, and Y is the amount of players.
+When Z reaches 0 the game has begun. In this message Y is the amount of players.
 This also means all player numbers in this game are from 0 until Y.
 
 #### In game messages

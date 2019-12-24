@@ -1,22 +1,12 @@
 package server.handlers;
 
-import game.field.FieldParser;
 import game.field.GameField;
-import game.play.Game;
 import game.play.Player;
 import server.clients.ClientSocket;
 
-public class JoinHandler implements ClientHandler {
-    private final ClientSocket[] clients;
-    private final Game game;
-
+public class JoinHandler extends GameHandler {
     JoinHandler() {
-        // Load the specified map for this game
-        GameField field = new FieldParser().fromBMapFile("./classic.bmap");
-        // System.out.println("Loaded new map for game: \n" + field.toString());
-        this.game = new Game(field);
-        // Every player ID will also be the slot in this socket array
-        this.clients = new ClientSocket[game.playerSlots()];
+        super("practice.bmap");
     }
 
     void join(ClientSocket client, String name) {
@@ -24,42 +14,41 @@ public class JoinHandler implements ClientHandler {
         int playerId = this.game.nextFreePlayer();
         Player clientPlayer = new Player(playerId, name,
                 this.game.spawnPoint(playerId));
-        this.game.addPlayer(clientPlayer);
-        this.clients[clientPlayer.getId()] = client;
-        client.inGameId = clientPlayer.getId();
+        addToGame(clientPlayer, client);
+        ClientHandler oldHandler = client.handler;
         client.handler = this;
-        client.send("joined " + clientPlayer.getId());
-        update();
+        if (client.send("joined " + clientPlayer.getId())) {
+            update();
+        } else {
+            removeFromGame(playerId);
+            client.handler = oldHandler;
+        }
     }
 
-    private void sendNames(ClientSocket socket) {
+    private String playerNames() {
+        StringBuilder sb = new StringBuilder();
         for (Player p : this.game.getPlayers()) {
-            if (p != null) socket.send("named " +
-                    p.getId() + " " + p.getName());
+            if (p != null) sb.append("named ").append(p.getId())
+                    .append(" ").append(p.getName()).append("\n");
         }
+        return sb.deleteCharAt(sb.length() - 1).toString();
     }
 
     private void update() {
-        boolean sendFail = false;
         // Update all clients
-        for (ClientSocket c : this.clients) {
-            if (c != null) {
-                sendFail |= c.send("joining " +
-                        this.game.getJoinedPlayers() +
-                        "/" + this.game.playerSlots());
-            }
-        }
-        // Todo: if a send fails... I guess kick them from the game?
+        String joining = "joining " + this.game.getJoinedPlayers() +
+                "/" + this.game.playerSlots();
+        broadcast(joining);
         // Check if we are ready to play!
         if (this.game.isFull()) {
             GameField field = this.game.getField();
-            for (ClientSocket c : clients) {
-                // Send all player names and 'loading' message
-                sendNames(c);
-                c.send("loading " + field.getWidth() + "/" + field.getHeight());
-            }
+            // Send all player names and 'loading' message
+            broadcast(playerNames());
+            broadcast("loading " + field.getWidth() + "/" + field.getHeight());
             // Send the map to be played and let 'PlayHandler' take over
-            for (ClientSocket c : clients) c.send(field.toString());
+            for (int i = 0; i < field.getHeight(); i++) {
+                broadcast("map " + i + " " + field.toString(i));
+            }
             new PlayHandler(game, clients);
         }
     }
@@ -75,7 +64,7 @@ public class JoinHandler implements ClientHandler {
                 update();
                 break;
             case "names":
-                sendNames(socket);
+                socket.send(playerNames());
                 break;
         }
     }
