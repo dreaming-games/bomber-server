@@ -2,12 +2,17 @@ package server.clients;
 
 import lombok.Setter;
 import server.handlers.ClientHandler;
+import server.main.EasyLogger;
 
 import java.io.*;
 import java.net.Socket;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ClientSocket {
+    private static final Logger LOGGER = EasyLogger.getLogger("Client");
+
     private final int clientID;
     private final Socket connection;
     private final BufferedReader reader;
@@ -26,7 +31,7 @@ public class ClientSocket {
                 break;
             }
         }
-        System.err.println("Connection with client " + clientID + " closed");
+        LOGGER.log(Level.INFO, "Connection with client " + clientID + " closed");
     }
 
     public ClientSocket(int id, Socket connection, ClientHandler handler) throws IOException {

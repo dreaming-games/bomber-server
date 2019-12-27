@@ -1,0 +1,10 @@
+// If this option is set, the server will send the message 'tick X' after every message
+// And will then wait for every player to send 'done X' with the same X (the tick counter)
+// before it will continue with the next tick. (Not yet implemented)
+waitTickDone=false
+
+// This option is about walking in two different ways:
+// If it is set to true, then walking (continuously) will work by sending a walk command for every game tick.
+// If it is not set (or not true) walking continuously can be done by sending the walk command and then a stop walk
+// command when you wish to stop walking. So basically less precision but easier to do and less messages.
+resetWalkOnTick=false

@@ -64,5 +64,7 @@ During the game, the server will send the following messages:
 Clients can send two different messages during a game:
 - ```move D``` to move in direction D where D is one of ```{ N, NE, E, SE, S, SW, W, NW }``` for
 the direction to move in based on wind direction annotations.
+- ```stop``` to stand still (stop moving). If this message is necessary depends on the
+```resetWalkOnTick``` setting. See the file 'resources/settings' for more information about this.
 - ```drop B``` to drop a bomb, where B is the bomb type id (in case we implement different bombs)
 sending ```bomb``` will be the same as ```bomb 0``` aka the default cross explosion bombs.

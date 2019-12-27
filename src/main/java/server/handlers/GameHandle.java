@@ -1,12 +1,26 @@
 package server.handlers;
 
-import game.field.FieldParser;
-import game.field.GameField;
-import game.play.Game;
-import game.play.Player;
+import bomber.field.FieldParser;
+import bomber.field.GameField;
+import bomber.game.Game;
+import bomber.game.Settings;
+import bomber.player.Player;
 import server.clients.ClientSocket;
 
-abstract class GameHandler implements ClientHandler {
+import java.io.IOException;
+
+class GameHandle {
+    private static final Settings gameSettings;
+    static {
+        gameSettings = new Settings();
+        try {
+            gameSettings.addSettingsFromFile("settings");
+        } catch (IOException e) {
+            System.err.println("Did not load settings file: " + e.getMessage());
+        }
+    }
+
+
     final ClientSocket[] clients;
     final Game game;
 
@@ -14,14 +28,14 @@ abstract class GameHandler implements ClientHandler {
     ////// Constructors for either a new game or passing along //////
     /////////////////////////////////////////////////////////////////
 
-    GameHandler(String mapFile) {
+    GameHandle(String mapFile) {
         GameField field = new FieldParser().fromBMapFile(mapFile);
-        this.game = new Game(field);
+        this.game = new Game(field, gameSettings);
         // Every player ID will also be the slot in this socket array
         this.clients = new ClientSocket[game.playerSlots()];
     }
 
-    GameHandler(ClientSocket[] sockets, Game game) {
+    GameHandle(ClientSocket[] sockets, Game game) {
         this.clients = sockets;
         this.game = game;
     }
@@ -46,7 +60,7 @@ abstract class GameHandler implements ClientHandler {
     ////// Some help with handling communication //////
     ///////////////////////////////////////////////////
 
-    void send(ClientSocket client, String msg) {
+    private void send(ClientSocket client, String msg) {
         if (client == null || client.send(msg)) {
             return;
         }

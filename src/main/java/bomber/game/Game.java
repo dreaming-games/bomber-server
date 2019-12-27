@@ -1,10 +1,9 @@
-package game.play;
+package bomber.game;
 
-import game.field.GameField;
-import game.general.Point;
+import bomber.field.GameField;
+import bomber.general.Point;
+import bomber.player.Player;
 import lombok.Getter;
-
-import java.util.ArrayList;
 
 public class Game {
     @Getter
@@ -13,11 +12,13 @@ public class Game {
     private final GameField field;
     @Getter
     private final Player[] players;
+    private final Settings settings;
 
 
-    public Game(GameField field) {
+    public Game(GameField field, Settings settings) {
         this.field = field;
         this.joinedPlayers = 0;
+        this.settings = settings;
         this.players = new Player[field.getSpawnPoints().length];
     }
 
@@ -37,7 +38,7 @@ public class Game {
     }
 
     public Point spawnPoint(int index) {
-        return field.getSpawnPoints()[index];
+        return new Point(field.getSpawnPoints()[index]);
     }
 
     public boolean isFinished() {
@@ -54,8 +55,15 @@ public class Game {
     public void gameTick() {
         // Move players
         for (Player p : players) {
-            if (p != null) p.move();
+            if (p != null) {
+                p.move(field);
+                if (settings.isTrue("resetWalkOnTick")) {
+                    p.setMoving(false);
+                }
+
+            }
         }
+        // Explode bombs
     }
 
     ////////////////////////////////////////

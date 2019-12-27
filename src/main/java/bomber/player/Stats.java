@@ -1,4 +1,4 @@
-package game.play;
+package bomber.player;
 
 import lombok.Getter;
 

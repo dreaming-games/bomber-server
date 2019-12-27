@@ -1,6 +1,6 @@
-package game.field;
+package bomber.field;
 
-import game.general.Point;
+import bomber.general.Point;
 
 import java.io.BufferedReader;
 import java.io.IOException;

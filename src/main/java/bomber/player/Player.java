@@ -1,7 +1,8 @@
-package game.play;
+package bomber.player;
 
-import game.general.Direction;
-import game.general.Point;
+import bomber.field.GameField;
+import bomber.general.Direction;
+import bomber.general.Point;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,14 +40,18 @@ public class Player {
         this.lives -= damage;
     }
 
-    boolean isAlive() {
+    public boolean isAlive() {
         return this.lives > 0;
     }
 
-    void move() {
+    public void move(GameField field) {
         if (moving) {
-            this.direction.move(this.location,
-                    this.stats.getMoveSpeed());
+            Direction d = this.direction;
+            // Move X and fix collision, then same for Y
+            d.moveXScale(this.location, this.stats.getMoveSpeed());
+            field.undoCollide(location, 0.4, d, true, false);
+            d.moveYScale(this.location, this.stats.getMoveSpeed());
+            field.undoCollide(location, 0.4, d, false, true);
         }
     }
 }

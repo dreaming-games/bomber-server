@@ -1,4 +1,4 @@
-package game.general;
+package bomber.general;
 
 import lombok.AllArgsConstructor;
 
@@ -6,6 +6,11 @@ import lombok.AllArgsConstructor;
 public class Point {
     public double x;
     public double y;
+
+    public Point(Point p) {
+        this.x = p.x;
+        this.y = p.y;
+    }
 
     @Override
     public String toString() {

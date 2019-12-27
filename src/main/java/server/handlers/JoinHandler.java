@@ -1,65 +1,75 @@
 package server.handlers;
 
-import game.field.GameField;
-import game.play.Player;
+import bomber.field.GameField;
+import bomber.player.Player;
 import server.clients.ClientSocket;
 
-public class JoinHandler extends GameHandler {
-    JoinHandler() {
-        super("practice.bmap");
+public class JoinHandler implements ClientHandler {
+    private GameHandle gameHandle;
+
+    public JoinHandler() {
+        this.gameHandle = null;
     }
 
-    void join(ClientSocket client, String name) {
+    private void join(ClientSocket client, String name) {
         // Find a spawn point for this player and add player to this game
-        int playerId = this.game.nextFreePlayer();
+        int playerId = this.gameHandle.game.nextFreePlayer();
         Player clientPlayer = new Player(playerId, name,
-                this.game.spawnPoint(playerId));
-        addToGame(clientPlayer, client);
+                this.gameHandle.game.spawnPoint(playerId));
+        this.gameHandle.addToGame(clientPlayer, client);
         ClientHandler oldHandler = client.handler;
         client.handler = this;
-        if (client.send("joined " + clientPlayer.getId())) {
-            update();
-        } else {
-            removeFromGame(playerId);
+        if (!client.send("joined " + clientPlayer.getId())) {
+            this.gameHandle.removeFromGame(playerId);
             client.handler = oldHandler;
+            update();
         }
+        update();
     }
 
     private String playerNames() {
         StringBuilder sb = new StringBuilder();
-        for (Player p : this.game.getPlayers()) {
+        for (Player p : this.gameHandle.game.getPlayers()) {
             if (p != null) sb.append("named ").append(p.getId())
                     .append(" ").append(p.getName()).append("\n");
         }
         return sb.deleteCharAt(sb.length() - 1).toString();
     }
 
-    private void update() {
-        // Update all clients
-        String joining = "joining " + this.game.getJoinedPlayers() +
-                "/" + this.game.playerSlots();
-        broadcast(joining);
+    private synchronized void update() {
+        String joining = "joining " + this.gameHandle.game.getJoinedPlayers() +
+                "/" + this.gameHandle.game.playerSlots();
+        this.gameHandle.broadcast(joining);
+
         // Check if we are ready to play!
-        if (this.game.isFull()) {
-            GameField field = this.game.getField();
-            // Send all player names and 'loading' message
-            broadcast(playerNames());
-            broadcast("loading " + field.getWidth() + "/" + field.getHeight());
-            // Send the map to be played and let 'PlayHandler' take over
+        if (this.gameHandle.game.isFull()) {
+            this.gameHandle.broadcast(playerNames());
+
+            GameField field = this.gameHandle.game.getField();
+            this.gameHandle.broadcast("loading " + field.getWidth() + "/" + field.getHeight());
             for (int i = 0; i < field.getHeight(); i++) {
-                broadcast("map " + i + " " + field.toString(i));
+                this.gameHandle.broadcast("map " + i + " " + field.toString(i));
             }
-            new PlayHandler(game, clients);
+
+            new PlayHandler(this.gameHandle);
         }
     }
 
-    boolean isFull() {
-        return this.game.isFull();
-    }
-
     @Override
-    public void onMessage(ClientSocket socket, String msg) {
-        switch (msg) {
+    public synchronized void onMessage(ClientSocket socket, String msg) {
+        String[] msgParts = msg.split(" ", 2);
+        switch (msgParts[0]) {
+            case "join":
+                // todo: check if game already played
+                if (this.gameHandle == null || this.gameHandle.game.isFull()) {
+                    System.out.println("Creating new Game handle");
+                    this.gameHandle = new GameHandle("practice.bmap");
+                }
+                this.join(socket, msgParts[1]);
+                break;
+            case "practice":
+                // Todo
+                break;
             case "update":
                 update();
                 break;
