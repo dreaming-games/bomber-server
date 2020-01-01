@@ -8,3 +8,6 @@ waitTickDone=false
 // If it is not set (or not true) walking continuously can be done by sending the walk command and then a stop walk
 // command when you wish to stop walking. So basically less precision but easier to do and less messages.
 resetWalkOnTick=false
+
+// The amount of ticks that should be played (if all goes well) per second
+ticksPerSec=30

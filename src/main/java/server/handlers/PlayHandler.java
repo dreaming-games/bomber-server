@@ -1,7 +1,10 @@
 package server.handlers;
 
+import bomber.entity.Bomb;
+import bomber.events.Event;
+import bomber.events.TickEvents;
 import bomber.general.Direction;
-import bomber.player.Player;
+import bomber.entity.Player;
 import server.clients.ClientSocket;
 
 public class PlayHandler implements ClientHandler {
@@ -25,22 +28,65 @@ public class PlayHandler implements ClientHandler {
         }
 
         while (!this.gameHandle.game.isFinished()) {
-            long tickStart = System.currentTimeMillis();
-
             // 1) play a game tick
-            this.gameHandle.game.gameTick();
-            long sendStart = System.currentTimeMillis();
-            // 2) update all clients state
-            for (Player p : this.gameHandle.game.getPlayers()) {
-                if (p != null) {
-                    this.gameHandle.broadcast("p " + p.getId() + " " + p.getLocation().x
-                            + "/" + p.getLocation().y + " " + p.getDirection().toString());
-                }
-            }
+            long tickStart = System.currentTimeMillis();
+            TickEvents tick = this.gameHandle.game.gameTick();
 
+            // 2) update all clients states
+            long sendStart = System.currentTimeMillis();
+            updateClients(tick);
+
+            // 3) Wait for the tick to end (either time or messages)
             tickWait(tickStart, sendStart);
         }
         System.err.println("Game loop finished");
+    }
+
+    ////////////////////////////////////////
+    ////// Client communication stuff //////
+    ////////////////////////////////////////
+
+    private void updateClients(TickEvents tick) {
+        this.gameHandle.broadcast("tick " + tick.getTickNum());
+
+        // Send all player locations
+        for (Player p : this.gameHandle.game.getPlayers()) {
+            if (p != null) {
+                this.gameHandle.broadcast("p " + p.getId() + " " + p.getLocation().x
+                        + "/" + p.getLocation().y + " " + p.getDirection().toString());
+            }
+        }
+
+        // Send all events that happened
+        for (Event event : tick.getEvents()) {
+            switch (event.getType()) {
+                case BOMB_BOOM: {
+                    Bomb b = (Bomb) event.getData();
+                    this.gameHandle.broadcast("boom "
+                            + b.getLocX() + " " + b.getLocY());
+                    break;
+                }
+                case BOMB_DROP: {
+                    Bomb b = (Bomb) event.getData();
+                    this.gameHandle.broadcast("drop " + b.getLocX()
+                            + " " + b.getLocY() + " " + b.getPlayerId());
+                    break;
+                }
+                case PLAYER_DIED: {
+                    Player p = (Player) event.getData();
+                    this.gameHandle.broadcast("died "
+                            + p.getId());
+                    break;
+                }
+                case PLAYER_HURT: {
+                    Player p = (Player) event.getData();
+                    this.gameHandle.broadcast("hurt "
+                            + p.getId());
+                    break;
+                }
+            }
+        }
+
     }
 
     @Override
@@ -49,7 +95,7 @@ public class PlayHandler implements ClientHandler {
         Player player = this.gameHandle.game.getPlayers()[socket.inGameId];
         switch (msgParts[0]) {
             case "drop": // Drop a bomb
-                System.out.println("Dropping a bomb");
+                this.gameHandle.game.dropBomb(player);
                 break;
             case "stop": // Stop moving!
                 player.setMoving(false);
@@ -70,6 +116,7 @@ public class PlayHandler implements ClientHandler {
     /////////////////////////////////////
     ////// Helper (timing) methods //////
     /////////////////////////////////////
+
     private void safeSleep(long millis) {
         try {
             if (millis <= 0) return;

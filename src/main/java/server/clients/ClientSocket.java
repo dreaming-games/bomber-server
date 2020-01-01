@@ -1,12 +1,10 @@
 package server.clients;
 
-import lombok.Setter;
 import server.handlers.ClientHandler;
 import server.main.EasyLogger;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.channels.AsynchronousSocketChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

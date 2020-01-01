@@ -4,7 +4,7 @@ import bomber.field.FieldParser;
 import bomber.field.GameField;
 import bomber.game.Game;
 import bomber.game.Settings;
-import bomber.player.Player;
+import bomber.entity.Player;
 import server.clients.ClientSocket;
 
 import java.io.IOException;

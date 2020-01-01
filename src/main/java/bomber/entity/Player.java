@@ -1,4 +1,4 @@
-package bomber.player;
+package bomber.entity;
 
 import bomber.field.GameField;
 import bomber.general.Direction;

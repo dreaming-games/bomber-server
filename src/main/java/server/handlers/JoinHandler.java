@@ -1,7 +1,7 @@
 package server.handlers;
 
 import bomber.field.GameField;
-import bomber.player.Player;
+import bomber.entity.Player;
 import server.clients.ClientSocket;
 
 public class JoinHandler implements ClientHandler {
@@ -60,9 +60,8 @@ public class JoinHandler implements ClientHandler {
         String[] msgParts = msg.split(" ", 2);
         switch (msgParts[0]) {
             case "join":
-                // todo: check if game already played
-                if (this.gameHandle == null || this.gameHandle.game.isFull()) {
-                    System.out.println("Creating new Game handle");
+                if (this.gameHandle == null || this.gameHandle.game.isFull()
+                        || this.gameHandle.game.gameTick().getTickNum() > 0) {
                     this.gameHandle = new GameHandle("practice.bmap");
                 }
                 this.join(socket, msgParts[1]);

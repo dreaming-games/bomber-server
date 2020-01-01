@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class GameField {
     @Getter
     private final Point[] spawnPoints;
+    @Getter
     private final byte[][] field;
 
     GameField(ArrayList<byte[]> byteLines, ArrayList<Point> spawnPoints) {
@@ -53,7 +54,7 @@ public class GameField {
             for (int yBox = topBox; yBox <= botBox; yBox++) {
                 // Go over all squares that this location (w/radius) is in.
                 byte val = field[yBox][xBox];
-                if (val == 1 || val == 10) {
+                if (val == MapObject.WALL || val == MapObject.CRATE) {
                     // if wall or crate, move back by the amount of overlap:
                     if (checkX) {
                         double xOverlap = Math.abs( Math.abs( (loc.x) - (xBox + 0.5) ) - 0.5 - radius );
@@ -79,16 +80,7 @@ public class GameField {
     public String toString(int lineY) {
         StringBuilder sb = new StringBuilder();
         for (byte aByte : this.field[lineY]) {
-            if (aByte == 0) {
-                // Empty spot
-                sb.append(" ");
-            } else if (aByte == 1) {
-                // A wall
-                sb.append("#");
-            } else if (aByte >= 10 && aByte <= 100) {
-                // Crate, filled or not
-                sb.append(".");
-            }
+            sb.append((char) aByte);
         }
         return sb.toString();
     }
