@@ -7,10 +7,6 @@ import server.clients.ClientSocket;
 public class JoinHandler implements ClientHandler {
     private GameHandle gameHandle;
 
-    public JoinHandler() {
-        this.gameHandle = null;
-    }
-
     private void join(ClientSocket client, String name) {
         // Find a spawn point for this player and add player to this game
         int playerId = this.gameHandle.game.nextFreePlayer();

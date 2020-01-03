@@ -5,6 +5,7 @@ import bomber.events.Event;
 import bomber.events.EventType;
 import bomber.events.TickEvents;
 import bomber.field.GameField;
+import bomber.field.Square;
 import bomber.general.Point;
 import bomber.entity.Player;
 import lombok.Getter;
@@ -13,6 +14,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import static bomber.field.MapObject.CRATE;
+import static bomber.field.MapObject.EMPTY;
 
 public class Game {
     @Getter
@@ -74,6 +78,16 @@ public class Game {
         return (this.playerSlots() > 1 && alive <= 1) || alive == 0;
     }
 
+    public synchronized int winnerId() {
+        if (!isFinished()) return -1;
+        for (Player p : players) {
+            if (p != null && p.isAlive()) {
+                return p.getId();
+            }
+        }
+        return -2;
+    }
+
     public synchronized TickEvents gameTick() {
         // Move players
         for (Player p : players) {
@@ -86,11 +100,7 @@ public class Game {
         }
 
         // Explode bombs
-        for (Bomb b : bombs) {
-            if (!b.isExploded() && b.tick()) {
-                explode(b);
-            }
-        }
+        explode();
 
         // Return events from this tick and make new one for next tick
         TickEvents thisTickEvents = currentTickEvents;
@@ -98,39 +108,66 @@ public class Game {
         return thisTickEvents;
     }
 
-    private void explode(Bomb exploded) {
-        LinkedList<Bomb> hit = new LinkedList<>();
-        exploded.setExploded(true);
-        hit.push(exploded);
+    private synchronized void explode() {
+        ArrayList<Bomb> boom = new ArrayList<>();
+        // All bombs that are supposed to go off this tick
+        for (Bomb b : bombs) {
+            if (!b.isExploded() && b.tick()) {
+                b.setExploded(true);
+                boom.add(b);
+            }
+        }
 
-        while (!hit.isEmpty()) {
-            Bomb b = hit.pollFirst();
+        // Put all chain explosion bombs in boom
+        for (int at = 0; at < boom.size(); at++) {
+            Bomb b = boom.get(at);
+            b.calculateBlast(field);
+            // Check all other bombs
+            for (Bomb b2 : bombs) {
+                if (b2.isExploded()) continue;
+                if (b.inBlast(new Point(b2.getLocation().getX() + 0.5,
+                        b2.getLocation().getY() + 0.5), 0.2)) {
+                    b2.setExploded(true);
+                    boom.add(b2);
+                }
+            }
+        }
 
-            // Bomb exploded!
+        // For all these exploded bombs:
+        for (Bomb b : boom) {
+            // Add events for them
             currentTickEvents.getEvents().add(new Event<>(
                     EventType.BOMB_BOOM, b));
 
-            // Check if players got hurt / died
-//            for (Player p : players) {
-//                if (b.inBlast(p.getLocation(), 0.4)) {
-//                    currentTickEvents.getEvents().add(new Event<>(
-//                            EventType.PLAYER_HURT, p));
-//                }
-//            }
-
-            // Check all other bombs (chain explosion?)
-            for (Bomb b2 : bombs) {
-                if (b2.isExploded()) continue;
-                if (b.inBlast(new Point(b2.getLocX() + 0.5,
-                        b2.getLocY() + 0.5), 0.2)) {
-                    b2.setExploded(true);
-                    hit.push(b2);
+            for (Square blastRect : b.getBlast()) {
+                // Check which crates were destroyed
+                for (Square single : blastRect) {
+                    if (field.getXY(single) == CRATE) {
+                        currentTickEvents.getEvents().add(new Event<>(
+                                EventType.CRATE_DESTROY, single));
+                        field.setXY(single, EMPTY);
+                    }
                 }
             }
+        }
 
+        // Check which players got hurt
+        for (Player player : players) {
+            if (player == null) continue;
+            for (Bomb b : boom) {
+                if (b.inBlast(player.getLocation(), 0.4)) {
+                    player.takeDamage(1);
+                    currentTickEvents.getEvents().add(new Event<>(
+                            EventType.PLAYER_HURT, player));
+                    if (player.getLives() <= 0) {
+                        currentTickEvents.getEvents().add(new Event<>(
+                                EventType.PLAYER_DIED, player));
+                    }
+                    break;
+                }
+            }
         }
     }
-
 
     public synchronized void dropBomb(Player player) {
         Bomb b = new Bomb(player, settings

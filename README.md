@@ -38,6 +38,7 @@ The game can start when not enough players joined yet (if the server decides thi
 - Before a game, clients can also query the names of other players in the game with the ```names```
 message, to which the server will respond with N messages of the format ```named I NAME``` for all
 N players, where I is the player number, name NAME is the player name for that player number.
+These named message will also be send to everybody just before a game starts.
 - When a game has finished you will receive the message ```idle``` (as well as game over
 messages described later) to signify that you are in the position to join another game.
 This ```idle``` message may also be received when first establishing a connection to the server.
@@ -57,14 +58,24 @@ This also means all player numbers in this game are from 0 until Y.
 During the game, the server will send the following messages:
 - ```map X/Y Z``` meaning the object on the map at X/Y changed to Z where Z is a map symbol.
 - ```p P X/Y D``` meaning that player P is now at X/Y facing direction D.
-- ```hurt P``` meaning that player P got damaged.
+- ```hurt P L``` meaning that player P got damaged, and has L lives left now.
 - ```died P``` meaning that player P died.
 - ```bomb P X/Y``` meaning that player P dropped a bomb at location X Y.
+- ```over P``` meaning that the game is over and P is the id of the winning player,
+P may also not me there (the message will then be just ```over```) if this game did
+not have a winner (maybe a practice game or single player test map, etc)
 
 Clients can send two different messages during a game:
 - ```move D``` to move in direction D where D is one of ```{ N, NE, E, SE, S, SW, W, NW }``` for
-the direction to move in based on wind direction annotations.
+the direction to move in based on wind direction annotations. This message will either move
+in direction D once (in the upcoming tick) or keep moving in that direction, in which case another move
+or the stop message should be send to stop moving, this behaviour is based on a server setting,
+see the stop message below.
 - ```stop``` to stand still (stop moving). If this message is necessary depends on the
 ```resetWalkOnTick``` setting. See the file 'resources/settings' for more information about this.
 - ```drop B``` to drop a bomb, where B is the bomb type id (in case we implement different bombs)
 sending ```bomb``` will be the same as ```bomb 0``` aka the default cross explosion bombs.
+
+## Changes
+Something you want differently about the server, messages etc. Or did you find
+a bug/error or wrong message format being sent, let me (Koen) know or change it yourself.

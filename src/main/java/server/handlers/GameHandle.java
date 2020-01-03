@@ -74,4 +74,11 @@ class GameHandle {
             send(client, msg);
         }
     }
+
+    void setClientHandler(ClientHandler handler) {
+        for (ClientSocket client : this.clients) {
+            if (client == null) continue;
+            client.handler = handler;
+        }
+    }
 }

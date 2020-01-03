@@ -31,6 +31,14 @@ public class GameField {
         return this.field.length;
     }
 
+    public byte getXY(Square s) {
+        return field[s.getY()][s.getX()];
+    }
+
+    public void setXY(Square s, byte val) {
+        field[s.getY()][s.getX()] = val;
+    }
+
     //////////////////////////////////////
     ////// Checking wall collisions //////
     //////////////////////////////////////

@@ -6,7 +6,7 @@ public class MapObject {
     public static final byte CRATE   = (byte) '.';
 
     private static final byte[] objects = { EMPTY, WALL, CRATE };
-    public static boolean isMapObject(byte b) {
+    static boolean isMapObject(byte b) {
         for (byte o : objects) {
             if (o == b) return true;
         }

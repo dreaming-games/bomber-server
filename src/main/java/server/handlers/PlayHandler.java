@@ -3,9 +3,11 @@ package server.handlers;
 import bomber.entity.Bomb;
 import bomber.events.Event;
 import bomber.events.TickEvents;
+import bomber.field.Square;
 import bomber.general.Direction;
 import bomber.entity.Player;
 import server.clients.ClientSocket;
+import server.main.Server;
 
 public class PlayHandler implements ClientHandler {
     private final GameHandle gameHandle;
@@ -39,7 +41,17 @@ public class PlayHandler implements ClientHandler {
             // 3) Wait for the tick to end (either time or messages)
             tickWait(tickStart, sendStart);
         }
+
+        if (this.gameHandle.game.playerSlots() <= 1) {
+            this.gameHandle.broadcast("over");
+        } else {
+            // Let everybody know the winner
+            this.gameHandle.broadcast("over "
+                    + this.gameHandle.game.winnerId());
+        }
+
         System.err.println("Game loop finished");
+        gameHandle.setClientHandler(Server.idleHandler);
     }
 
     ////////////////////////////////////////
@@ -62,14 +74,16 @@ public class PlayHandler implements ClientHandler {
             switch (event.getType()) {
                 case BOMB_BOOM: {
                     Bomb b = (Bomb) event.getData();
-                    this.gameHandle.broadcast("boom "
-                            + b.getLocX() + " " + b.getLocY());
+                    this.gameHandle.broadcast("boom " + b.toString());
+                    for (Square blast : b.getBlast()) {
+                        this.gameHandle.broadcast("fire " + blast);
+                    }
                     break;
                 }
                 case BOMB_DROP: {
                     Bomb b = (Bomb) event.getData();
-                    this.gameHandle.broadcast("drop " + b.getLocX()
-                            + " " + b.getLocY() + " " + b.getPlayerId());
+                    this.gameHandle.broadcast("drop " + b.toString()
+                            + " " + b.getPlayerId());
                     break;
                 }
                 case PLAYER_DIED: {
@@ -81,7 +95,15 @@ public class PlayHandler implements ClientHandler {
                 case PLAYER_HURT: {
                     Player p = (Player) event.getData();
                     this.gameHandle.broadcast("hurt "
-                            + p.getId());
+                            + p.getId() + " " + p.getLives());
+                    break;
+                }
+                case CRATE_DESTROY: {
+                    Square s = (Square) event.getData();
+                    // double space at end, 1 for separator, 1 for
+                    // new thing in map: empty spot = space
+                    this.gameHandle.broadcast("change "
+                            + s.getX() + " " + s.getY() + "  ");
                     break;
                 }
             }

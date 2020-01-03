@@ -11,11 +11,11 @@ import java.util.logging.Logger;
 
 public class Server {
     private static final Logger LOGGER = EasyLogger.getLogger("Server");
+    public static final ClientHandler idleHandler = new JoinHandler();
 
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) {
         System.out.println("\n");
-        ClientHandler handler = new JoinHandler();
 
         // Start server socket
         ServerSocket serverSocket;
@@ -32,7 +32,7 @@ public class Server {
         int currentClientId = 0;
         while (true) {
             try {
-                new ClientSocket(++currentClientId, serverSocket.accept(), handler);
+                new ClientSocket(++currentClientId, serverSocket.accept(), idleHandler);
                 LOGGER.log(Level.INFO,"Accepted a new client socket");
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Failed to accept socket:" + e.getMessage());

@@ -32,7 +32,6 @@ public class Player {
         this.direction = Direction.S;
         this.stats = new Stats();
         // All start with 3 lives
-        // Todo: config file for stats and lives?
         this.lives = 3;
     }
 
