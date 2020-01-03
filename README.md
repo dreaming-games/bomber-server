@@ -56,11 +56,15 @@ This also means all player numbers in this game are from 0 until Y.
 
 #### In game messages
 During the game, the server will send the following messages:
-- ```map X/Y Z``` meaning the object on the map at X/Y changed to Z where Z is a map symbol.
+- ```change X/Y Z``` meaning the object on the map at X/Y changed to Z where Z is a map symbol.
 - ```p P X/Y D``` meaning that player P is now at X/Y facing direction D.
 - ```hurt P L``` meaning that player P got damaged, and has L lives left now.
 - ```died P``` meaning that player P died.
-- ```bomb P X/Y``` meaning that player P dropped a bomb at location X Y.
+- ```drop X Y P``` meaning that player P dropped a bomb at location X Y.
+- ```boom X Y``` meaning that the bomb at X Y exploded.
+- ```fire X Y W H``` meaning that there is hurtful fire (explosion, etc) at X Y with size W H.
+Where W is width and H is height of course. This fire can be from a just exploded
+bomb or some fuse or something.
 - ```over P``` meaning that the game is over and P is the id of the winning player,
 P may also not me there (the message will then be just ```over```) if this game did
 not have a winner (maybe a practice game or single player test map, etc)

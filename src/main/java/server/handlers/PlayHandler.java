@@ -103,7 +103,7 @@ public class PlayHandler implements ClientHandler {
                     // double space at end, 1 for separator, 1 for
                     // new thing in map: empty spot = space
                     this.gameHandle.broadcast("change "
-                            + s.getX() + " " + s.getY() + "  ");
+                            + s.getX() + "/" + s.getY() + "  ");
                     break;
                 }
             }
