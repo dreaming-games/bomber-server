@@ -32,7 +32,7 @@ public class FieldParser {
 
                     if (c >= '0' && c <= '9') {
                         // Player? Add spawn point and set place empty
-                        spawnPoints.add(new Point(x, y));
+                        spawnPoints.add(new Point(x + 0.5, y + 0.5));
                         line[x] = MapObject.EMPTY;
                         continue;
                     }

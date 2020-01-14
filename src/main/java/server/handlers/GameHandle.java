@@ -10,6 +10,7 @@ import server.clients.ClientSocket;
 import java.io.IOException;
 
 class GameHandle {
+    // Load settings for all games to come
     private static final Settings gameSettings;
     static {
         gameSettings = new Settings();
@@ -20,24 +21,19 @@ class GameHandle {
         }
     }
 
-
-    final ClientSocket[] clients;
+    // Give this game handle a unique ID
+    private static int maxHandleId = 0;
+    final int handleId;
+    // Keep track of the game and clients
+    private final ClientSocket[] clients;
     final Game game;
 
-    /////////////////////////////////////////////////////////////////
-    ////// Constructors for either a new game or passing along //////
-    /////////////////////////////////////////////////////////////////
-
     GameHandle(String mapFile) {
+        this.handleId = ++maxHandleId;
         GameField field = new FieldParser().fromBMapFile(mapFile);
         this.game = new Game(field, gameSettings);
         // Every player ID will also be the slot in this socket array
         this.clients = new ClientSocket[game.playerSlots()];
-    }
-
-    GameHandle(ClientSocket[] sockets, Game game) {
-        this.clients = sockets;
-        this.game = game;
     }
 
     //////////////////////////////////////////////////////

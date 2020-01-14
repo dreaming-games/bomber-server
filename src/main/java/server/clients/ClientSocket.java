@@ -19,6 +19,7 @@ public class ClientSocket {
     public int inGameId;
 
     private void messageLoop() {
+        LOGGER.log(Level.INFO, "Connection with client " + clientID + " opened");
         // Keep receiving messages and sent them to your handler
         while (!connection.isClosed()) {
             try {

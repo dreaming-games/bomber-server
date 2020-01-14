@@ -8,15 +8,17 @@ import bomber.general.Direction;
 import bomber.entity.Player;
 import server.clients.ClientSocket;
 import server.main.Server;
+import general.Runnable;
 
 public class PlayHandler implements ClientHandler {
-    private final GameHandle gameHandle;
+    private final Runnable<PlayHandler> onFinished;
+    final GameHandle gameHandle;
 
-    PlayHandler(GameHandle gameHandle) {
+    PlayHandler(GameHandle gameHandle, Runnable<PlayHandler> onFinished) {
         this.gameHandle = gameHandle;
-        for (ClientSocket client : gameHandle.clients) {
-            client.handler = this;
-        }
+        this.onFinished = onFinished;
+        gameHandle.setClientHandler(this);
+        // Start the actual game loop on a new thread
         Thread gameThread = new Thread(this::gameLoop);
         gameThread.setDaemon(true);
         gameThread.start();
@@ -52,6 +54,7 @@ public class PlayHandler implements ClientHandler {
 
         System.err.println("Game loop finished");
         gameHandle.setClientHandler(Server.idleHandler);
+        onFinished.run(this);
     }
 
     ////////////////////////////////////////
@@ -133,7 +136,6 @@ public class PlayHandler implements ClientHandler {
                 break;
         }
     }
-
 
     /////////////////////////////////////
     ////// Helper (timing) methods //////

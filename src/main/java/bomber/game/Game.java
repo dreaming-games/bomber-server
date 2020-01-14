@@ -12,8 +12,6 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 import static bomber.field.MapObject.CRATE;
 import static bomber.field.MapObject.EMPTY;
@@ -92,7 +90,7 @@ public class Game {
         // Move players
         for (Player p : players) {
             if (p != null) {
-                p.move(field);
+                p.tick(field);
                 if (settings.isTrue("resetWalkOnTick")) {
                     p.setMoving(false);
                 }
@@ -109,11 +107,25 @@ public class Game {
     }
 
     private synchronized void explode() {
+        if (bombs.isEmpty()) return;
         ArrayList<Bomb> boom = new ArrayList<>();
-        // All bombs that are supposed to go off this tick
-        for (Bomb b : bombs) {
-            if (!b.isExploded() && b.tick()) {
-                b.setExploded(true);
+
+        // All bombs that are supposed to go off this tick or are 'exploding'
+        Iterator<Bomb> bit = bombs.iterator();
+        while (bit.hasNext()) {
+            Bomb b = bit.next();
+            // If exploding, either check again or remove when done
+            if (b.getExploding() > 0) {
+                if (b.explodeTick()) {
+                    bit.remove();
+                    continue;
+                } else {
+                    boom.add(b);
+                }
+            }
+            // Tick... Tick... Boom?
+            if (b.tick()) {
+                b.explode(field);
                 boom.add(b);
             }
         }
@@ -121,13 +133,11 @@ public class Game {
         // Put all chain explosion bombs in boom
         for (int at = 0; at < boom.size(); at++) {
             Bomb b = boom.get(at);
-            b.calculateBlast(field);
-            // Check all other bombs
             for (Bomb b2 : bombs) {
-                if (b2.isExploded()) continue;
+                if (b2.getExploding() >= 0) continue;
                 if (b.inBlast(new Point(b2.getLocation().getX() + 0.5,
                         b2.getLocation().getY() + 0.5), 0.2)) {
-                    b2.setExploded(true);
+                    b2.explode(field);
                     boom.add(b2);
                 }
             }
@@ -145,6 +155,7 @@ public class Game {
                     if (field.getXY(single) == CRATE) {
                         currentTickEvents.getEvents().add(new Event<>(
                                 EventType.CRATE_DESTROY, single));
+                        // Todo: put down upgrades and stuff
                         field.setXY(single, EMPTY);
                     }
                 }
@@ -154,6 +165,7 @@ public class Game {
         // Check which players got hurt
         for (Player player : players) {
             if (player == null) continue;
+            if (player.getInvulnerable() >= 0) continue;
             for (Bomb b : boom) {
                 if (b.inBlast(player.getLocation(), 0.4)) {
                     player.takeDamage(1);

@@ -15,6 +15,8 @@ public class Player {
     private Stats stats;
     @Getter
     private int lives;
+    @Getter
+    private int invulnerable;
     @Setter @Getter
     private Point location;
     @Setter @Getter
@@ -37,13 +39,15 @@ public class Player {
 
     public void takeDamage(int damage) {
         this.lives -= damage;
+        // Todo: set the time someone is invulnerable
+        this.invulnerable = 40;
     }
 
-    public boolean isAlive() {
-        return this.lives > 0;
-    }
+    public void tick(GameField field) {
+        if (this.invulnerable >= 0) {
+            this.invulnerable--;
+        }
 
-    public void move(GameField field) {
         if (moving) {
             Direction d = this.direction;
             // Move X and fix collision, then same for Y
@@ -53,4 +57,9 @@ public class Player {
             field.undoCollide(location, 0.4, d, false, true);
         }
     }
+
+    public boolean isAlive() {
+        return this.lives > 0;
+    }
+
 }

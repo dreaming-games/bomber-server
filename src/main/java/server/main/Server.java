@@ -33,7 +33,6 @@ public class Server {
         while (true) {
             try {
                 new ClientSocket(++currentClientId, serverSocket.accept(), idleHandler);
-                LOGGER.log(Level.INFO,"Accepted a new client socket");
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Failed to accept socket:" + e.getMessage());
             }

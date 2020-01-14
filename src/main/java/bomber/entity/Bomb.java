@@ -21,7 +21,7 @@ public class Bomb {
     @Getter
     private int ticksToBoom;
     @Getter
-    private boolean exploded;
+    private int exploding;
 
     public Bomb(Player dropper, int ticksToBoom) {
         this.location = new Square(dropper.getLocation());
@@ -29,14 +29,23 @@ public class Bomb {
         this.playerId = dropper.getId();
 
         this.ticksToBoom = ticksToBoom;
-        this.exploded = false;
+        this.exploding = -1;
     }
 
     public boolean tick() {
-        return (--this.ticksToBoom) <= 0;
+        return (--this.ticksToBoom) == 0;
     }
 
-    public void calculateBlast(GameField field) {
+    public boolean explodeTick() {
+        return (--exploding) == 0;
+    }
+
+    public void explode(GameField field) {
+        this.calculateBlast(field);
+        this.exploding = 30;
+    }
+
+    private void calculateBlast(GameField field) {
         // lets assume a standard X explosion bomb for now
         this.blast = new Square[2];
 

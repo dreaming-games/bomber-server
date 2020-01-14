@@ -1,14 +1,15 @@
 package bomber.entity;
 
-import lombok.Getter;
+import lombok.Data;
 
+@Data
 class Stats {
-    @Getter
+    private int bombsAtATime;
     private double moveSpeed;
-    @Getter
     private int bombRadius;
 
     Stats() {
+        this.bombsAtATime = 2;
         this.moveSpeed = 0.2;
         this.bombRadius = 3;
     }
