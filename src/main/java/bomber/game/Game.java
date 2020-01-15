@@ -34,6 +34,7 @@ public class Game {
         this.joinedPlayers = 0;
         this.settings = settings;
         this.bombs = new ArrayList<>(64);
+        assert(field.getSpawnPoints().length > 0);
         this.players = new Player[field.getSpawnPoints().length];
         this.currentTickEvents = new TickEvents(0);
     }
@@ -52,6 +53,7 @@ public class Game {
     }
 
     public synchronized void removePlayer(Player player) {
+        assert(player != null);
         assert(this.players[player.getId()] == player);
         this.players[player.getId()] = null;
         this.joinedPlayers--;
@@ -59,6 +61,10 @@ public class Game {
 
     public synchronized Point spawnPoint(int index) {
         return new Point(field.getSpawnPoints()[index]);
+    }
+
+    public boolean hasStarted() {
+        return this.currentTickEvents.getTickNum() > 0;
     }
 
     /////////////////////////////////

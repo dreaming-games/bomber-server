@@ -14,16 +14,21 @@ public class JoinHandler implements ClientHandler {
         playHandlers = new ArrayList<>();
     }
 
-    @Override
-    public synchronized void onMessage(ClientSocket socket, String msg) {
-        // Don't have a game to join people to? Make a new game handle
-        if (this.joiningGameHandle == null || this.joiningGameHandle.game.isFull()
-                || this.joiningGameHandle.game.gameTick().getTickNum() > 0) {
+    private void ensureGame() {
+        if ( (this.joiningGameHandle == null) || this.joiningGameHandle.game.isFull()
+                || this.joiningGameHandle.game.hasStarted() ) {
+            System.out.println("Creating new game to join");
             this.joiningGameHandle = new GameHandle("1v1.bmap");
         }
+    }
+
+    @Override
+    public synchronized void onMessage(ClientSocket socket, String msg) {
+
         String[] msgParts = msg.split(" ", 2);
         switch (msgParts[0]) {
             case "join":
+                ensureGame();
                 join(socket, msgParts[1]);
                 break;
             case "games":
@@ -34,12 +39,21 @@ public class JoinHandler implements ClientHandler {
                 // Todo
                 break;
             case "update":
-                update();
+                if (joiningGameHandle != null)
+                    update();
                 break;
             case "names":
-                socket.send(playerNames());
+                if (joiningGameHandle != null)
+                    socket.send(playerNames());
                 break;
         }
+    }
+
+    @Override
+    public void onConnectionClose(ClientSocket socket) {
+        if (joiningGameHandle == null) return;
+        this.joiningGameHandle.removeFromGame(socket.inGameId);
+        update();
     }
 
     private void join(ClientSocket client, String name) {
@@ -49,13 +63,9 @@ public class JoinHandler implements ClientHandler {
                 this.joiningGameHandle.game.spawnPoint(playerId));
         this.joiningGameHandle.addToGame(clientPlayer, client);
 
-        ClientHandler oldHandler = client.handler;
         client.handler = this;
-        if (!client.send("joined " + clientPlayer.getId())) {
-            this.joiningGameHandle.removeFromGame(playerId);
-            client.handler = oldHandler;
-            update();
-        }
+        client.send("joined " + clientPlayer.getId());
+        System.out.println("Client joined (" + playerId + ")");
         update();
     }
 
@@ -66,6 +76,7 @@ public class JoinHandler implements ClientHandler {
 
         // Check if we are ready to play!
         if (this.joiningGameHandle.game.isFull()) {
+            System.out.println("Starting game");
             this.joiningGameHandle.broadcast(playerNames());
 
             GameField field = this.joiningGameHandle.game.getField();

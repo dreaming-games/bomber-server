@@ -24,6 +24,7 @@ class GameHandle {
     // Give this game handle a unique ID
     private static int maxHandleId = 0;
     final int handleId;
+
     // Keep track of the game and clients
     private final ClientSocket[] clients;
     final Game game;
@@ -47,6 +48,7 @@ class GameHandle {
     }
 
     void removeFromGame(int id) {
+        System.err.println("Removing player " + id + " from game");
         this.game.removePlayer(this.game.getPlayers()[id]);
         this.clients[id].inGameId = -1;
         this.clients[id] = null;
@@ -56,25 +58,18 @@ class GameHandle {
     ////// Some help with handling communication //////
     ///////////////////////////////////////////////////
 
-    private void send(ClientSocket client, String msg) {
-        if (client == null || client.send(msg)) {
-            return;
-        }
-        // Failed to send
-        System.err.println("Removing player " + client.inGameId + " due to fail in sending");
-        removeFromGame(client.inGameId);
-    }
-
-    void broadcast(String msg) {
-        for (ClientSocket client : this.clients) {
-            send(client, msg);
-        }
-    }
-
     void setClientHandler(ClientHandler handler) {
         for (ClientSocket client : this.clients) {
             if (client == null) continue;
             client.handler = handler;
         }
     }
+
+    void broadcast(String msg) {
+        for (ClientSocket client : this.clients) {
+            if (client == null) continue;
+            client.send(msg);
+        }
+    }
+
 }

@@ -15,8 +15,24 @@ public class ClientSocket {
     private final Socket connection;
     private final BufferedReader reader;
     private final BufferedWriter writer;
+
     public ClientHandler handler;
+    private boolean closed;
     public int inGameId;
+
+    public ClientSocket(int id, Socket connection, ClientHandler handler)
+            throws IOException {
+        this.reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        this.writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
+        this.connection = connection;
+        this.handler = handler;
+        this.closed = false;
+        this.clientID = id;
+        // Start listening thread
+        Thread messageThread = new Thread(this::messageLoop);
+        messageThread.setDaemon(true);
+        messageThread.start();
+    }
 
     private void messageLoop() {
         LOGGER.log(Level.INFO, "Connection with client " + clientID + " opened");
@@ -30,28 +46,25 @@ public class ClientSocket {
                 break;
             }
         }
+        onDisconnect();
+    }
+
+    private synchronized void onDisconnect() {
+        if (this.closed) return;
+        try {
+            if (!connection.isClosed()) connection.close();
+        } catch (IOException ignored) { }
+        this.handler.onConnectionClose(this);
         LOGGER.log(Level.INFO, "Connection with client " + clientID + " closed");
+        this.closed = true;
     }
 
-    public ClientSocket(int id, Socket connection, ClientHandler handler) throws IOException {
-        this.reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        this.writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream()));
-        this.connection = connection;
-        this.handler = handler;
-        this.clientID = id;
-        // Start listening thread
-        Thread thread = new Thread(this::messageLoop);
-        thread.setDaemon(true);
-        thread.start();
-    }
-
-    public boolean send(String message) {
+    public void send(String message) {
         try {
             this.writer.write(message + "\n");
             this.writer.flush();
-            return true;
         } catch (IOException e) {
-            return false;
+            onDisconnect();
         }
     }
 }

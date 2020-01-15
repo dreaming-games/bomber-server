@@ -4,6 +4,5 @@ import server.clients.ClientSocket;
 
 public interface ClientHandler {
     void onMessage(ClientSocket socket, String msg);
-
-
+    void onConnectionClose(ClientSocket socket);
 }

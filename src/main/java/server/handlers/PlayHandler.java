@@ -137,6 +137,11 @@ public class PlayHandler implements ClientHandler {
         }
     }
 
+    @Override
+    public void onConnectionClose(ClientSocket socket) {
+        // Todo: tell people that someone left?
+    }
+
     /////////////////////////////////////
     ////// Helper (timing) methods //////
     /////////////////////////////////////
