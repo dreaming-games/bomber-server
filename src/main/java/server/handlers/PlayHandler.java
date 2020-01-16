@@ -31,7 +31,7 @@ public class PlayHandler implements ClientHandler {
             safeSleep(1000);
         }
 
-        while (!this.gameHandle.game.isFinished()) {
+        while (this.gameHandle.game.isOnGoing()) {
             // 1) play a game tick
             long tickStart = System.currentTimeMillis();
             TickEvents tick = this.gameHandle.game.gameTick();
@@ -139,7 +139,7 @@ public class PlayHandler implements ClientHandler {
 
     @Override
     public void onConnectionClose(ClientSocket socket) {
-        // Todo: tell people that someone left?
+        gameHandle.removeFromGame(socket.inGameId);
     }
 
     /////////////////////////////////////

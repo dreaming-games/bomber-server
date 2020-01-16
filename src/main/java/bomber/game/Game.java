@@ -11,6 +11,7 @@ import bomber.entity.Player;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import static bomber.field.MapObject.CRATE;
@@ -71,19 +72,19 @@ public class Game {
     /////// Game play methods ///////
     /////////////////////////////////
 
-    public synchronized boolean isFinished() {
+    public synchronized boolean isOnGoing() {
         int alive = 0;
         for (Player p : players) {
             if (p != null && p.isAlive()) {
                 alive++;
             }
         }
-        // Finished if: ( VS battle and only 1 alive) or 0 alive
-        return (this.playerSlots() > 1 && alive <= 1) || alive == 0;
+        // Ongoing if: solo game and > 0 alive OR > 1 alive
+        return (this.playerSlots() <= 1 && alive > 0) || alive > 1;
     }
 
     public synchronized int winnerId() {
-        if (!isFinished()) return -1;
+        if (isOnGoing()) return -1;
         for (Player p : players) {
             if (p != null && p.isAlive()) {
                 return p.getId();
